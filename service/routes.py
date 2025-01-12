@@ -3,8 +3,8 @@ Account Service
 
 This microservice handles the lifecycle of Accounts
 """
-# pylint: disable=unused-import
-from flask import jsonify, request, make_response, abort, url_for   # noqa; F401
+# pylint: disable=unused-import,unused-variable
+from flask import jsonify, request, make_response, abort, url_for  # noqa: F401
 from service.models import Account
 from service.common import status  # HTTP Status Codes
 from . import app  # Import Flask application
@@ -31,12 +31,12 @@ def index():
         jsonify(
             name="Account REST API Service",
             version="1.0",
-            # paths=url_for("list_accounts", _external=True),
+            # paths=url_for("list_accounts", _external=True),  # Uncomment if used
         ),
         status.HTTP_200_OK,
     )
 
-    
+
 ######################################################################
 # CREATE A NEW ACCOUNT
 ######################################################################
@@ -45,17 +45,20 @@ def index():
 def create_accounts():
     """
     Creates an Account
-    This endpoint will create an Account based the data in the body that is posted
+    This endpoint will create an Account based on the data in the body that is posted
     """
     app.logger.info("Request to create an Account")
     check_content_type("application/json")
+    
     account = Account()
     account.deserialize(request.get_json())
     account.create()
     message = account.serialize()
+    
     # Uncomment once get_accounts has been implemented
-    # location_url = url_for("get_accounts", account_id=account.id, _external=True)
-    location_url = "/"  # Remove once get_accounts has been implemented
+    # location_url = url_for("get_accounts", account_id=account.id, _external=True) 
+    location_url = "/"  # Temporary while get_accounts is not implemented
+    
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
@@ -86,7 +89,7 @@ def list_accounts():
 def get_accounts(account_id):
     """
     Reads an Account
-    This endpoint will read an Account based the account_id that is requested
+    This endpoint will read an Account based on the account_id that is requested
     """
     app.logger.info("Request to read an Account with id: %s", account_id)
     account = Account.find(account_id)
@@ -132,7 +135,7 @@ def delete_accounts(account_id):
 
 
 ######################################################################
-#  U T I L I T Y   F U N C T I O N S
+# UTILITY FUNCTIONS
 ######################################################################
 
 def check_content_type(media_type):
